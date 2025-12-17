@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: shl-recommendation-engine
+    env: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: DATABASE_URL
+        fromDatabase:
+          name: shl-db
+          property: connectionString
+    healthCheckPath: /health
+
+databases:
+  - name: shl-db
+    databaseName: shl_db
+    user: shl_user
+    plan: free
