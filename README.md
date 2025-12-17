@@ -20,7 +20,7 @@ AI-powered test recommendation system for talent assessment using FastAPI, Postg
 
 ## 📁 Project Structure
 ```
-shl-recommendation-engine/
+shl-recommendation-engine/    # Project Folder
 ├── app/
 │   ├── main.py              # FastAPI application
 │   ├── models.py            # Database models
@@ -40,14 +40,6 @@ shl-recommendation-engine/
 └── README.md
 ```
 
-## 🚀 Quick Start
-
-### Prerequisites
-
-- Python 3.9+
-- PostgreSQL 12+
-- Git
-
 8. **Access the application**
 - API: http://127.0.0.1:8000
 - API Docs: http://127.0.0.1:8000/docs
@@ -55,52 +47,14 @@ shl-recommendation-engine/
 
 ## 📡 API Endpoints
 
-### Core Endpoints
-
-- `GET /` - API information
-- `GET /health` - Health check
-- `GET /db-status` - Database connection status
-
-### Assessment Endpoints
-
-- `GET /assessments` - Get all assessments
-- `GET /assessments/{id}` - Get specific assessment
-- `GET /job-roles` - Get all job roles
-- `GET /stats` - Database statistics
 
 
 
 
 
-### Recommendation Endpoint
 
-- `POST /recommend` - Get AI recommendations
 
-**Request Body:**
-```json
-{
-  "job_role": "Software Engineer",
-  "top_k": 5
-}
-```
 
-**Response:**
-```json
-{
-  "job_role": "Software Engineer",
-  "recommendations": [
-    {
-      "test_name": "Python Coding Assessment",
-      "confidence_score": 87.5,
-      "category": "Technical",
-      "test_description": "...",
-      "skills_match": "Python, Algorithms, Problem Solving"
-    }
-  ],
-  "total_recommendations": 5,
-  "timestamp": "2024-12-17T10:30:00"
-}
-```
 
 ## 🤖 ML Model Details
 
