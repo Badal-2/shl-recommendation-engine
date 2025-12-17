@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHL Assessment Recommendation Engine</title>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        /* Main Card */
+        .main-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeInUp 0.8s ease;
+        }
+
+        /* Search Section */
+        .search-section {
+            margin-bottom: 30px;
+        }
+
+        .search-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 15px 20px;
+            font-size: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        input[type="number"] {
+            width: 120px;
+            padding: 15px;
+            font-size: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+
+        button {
+            padding: 15px 40px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: white;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Suggestions */
+        .suggestions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .suggestion-chip {
+            padding: 8px 16px;
+            background: #f0f0f0;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .suggestion-chip:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Loading */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        /* Results Section */
+        .results-section {
+            display: none;
+        }
+
+        .results-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .results-header h2 {
+            color: #333;
+            font-size: 1.5rem;
+        }
+
+        .results-count {
+            background: #667eea;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        /* Test Cards */
+        .test-cards {
+            display: grid;
+            gap: 20px;
+        }
+
+        .test-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            transition: all 0.3s;
+            border-left: 5px solid #667eea;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .test-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .test-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .test-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+
+        .test-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .confidence-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .confidence-high {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .confidence-medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .confidence-low {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .test-description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .test-meta {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .meta-icon {
+            width: 20px;
+            height: 20px;
+        }
+
+        .category-tag {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #667eea;
+            color: white;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        /* Error Message */
+        .error-message {
+            display: none;
+            background: #f8d7da;
+            color: #721c24;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 5px solid #721c24;
+        }
+
+        .error-message.active {
+            display: block;
+            animation: shake 0.5s ease;
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .main-card {
+                padding: 25px;
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            input[type="number"] {
+                width: 100%;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🎯 SHL Assessment Recommendation Engine</h1>
+            <p>AI-Powered Test Recommendations for Talent Assessment</p>
+        </div>
+
+        <!-- Main Card -->
+        <div class="main-card">
+            <!-- Search Section -->
+            <div class="search-section">
+                <h2>Enter Job Role</h2>
+                
+                <div class="input-group">
+                    <input 
+                        type="text" 
+                        id="jobRoleInput" 
+                        placeholder="e.g., Software Engineer, Data Scientist, Project Manager"
+                        autocomplete="off"
+                    >
+                    <input 
+                        type="number" 
+                        id="topKInput" 
+                        value="5" 
+                        min="1" 
+                        max="10"
+                        title="Number of recommendations"
+                    >
+                    <button id="searchBtn" onclick="getRecommendations()">
+                        🔍 Get Recommendations
+                    </button>
+                </div>
+
+                <!-- Suggestions -->
+                <div class="suggestions">
+                    <span style="color: #666; margin-right: 10px;">Quick suggestions:</span>
+                    <div class="suggestion-chip" onclick="fillJobRole('Software Engineer')">Software Engineer</div>
+                    <div class="suggestion-chip" onclick="fillJobRole('Data Scientist')">Data Scientist</div>
+                    <div class="suggestion-chip" onclick="fillJobRole('Frontend Developer')">Frontend Developer</div>
+                    <div class="suggestion-chip" onclick="fillJobRole('DevOps Engineer')">DevOps Engineer</div>
+                    <div class="suggestion-chip" onclick="fillJobRole('Project Manager')">Project Manager</div>
+                </div>
+            </div>
+
+            <!-- Error Message -->
+            <div class="error-message" id="errorMessage"></div>
+
+            <!-- Loading -->
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>🤖 AI is analyzing and finding best assessments...</p>
+            </div>
+
+            <!-- Results Section -->
+            <div class="results-section" id="resultsSection">
+                <div class="results-header">
+                    <h2>Recommended Assessments for: <span id="jobRoleTitle"></span></h2>
+                    <div class="results-count" id="resultsCount"></div>
+                </div>
+                <div class="test-cards" id="testCards"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API Base URL
+        const API_URL = 'http://127.0.0.1:8000';
+
+        // Fill job role from suggestion
+        function fillJobRole(role) {
+            document.getElementById('jobRoleInput').value = role;
+            document.getElementById('jobRoleInput').focus();
+        }
+
+        // Enter key support
+        document.getElementById('jobRoleInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                getRecommendations();
+            }
+        });
+
+        // Main function to get recommendations
+        async function getRecommendations() {
+            const jobRole = document.getElementById('jobRoleInput').value.trim();
+            const topK = parseInt(document.getElementById('topKInput').value);
+
+            // Validation
+            if (!jobRole) {
+                showError('Please enter a job role');
+                return;
+            }
+
+            if (topK < 1 || topK > 10) {
+                showError('Number of recommendations must be between 1 and 10');
+                return;
+            }
+
+            // Hide previous results and errors
+            hideError();
+            hideResults();
+            showLoading();
+
+            // Disable button
+            const searchBtn = document.getElementById('searchBtn');
+            searchBtn.disabled = true;
+            searchBtn.textContent = '⏳ Processing...';
+
+            try {
+                // Make API call
+                const response = await fetch(`${API_URL}/recommend`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        job_role: jobRole,
+                        top_k: topK
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                // Hide loading
+                hideLoading();
+
+                // Display results
+                displayResults(data);
+
+            } catch (error) {
+                hideLoading();
+                showError(`Error: ${error.message}. Make sure the API server is running!`);
+            } finally {
+                // Re-enable button
+                searchBtn.disabled = false;
+                searchBtn.textContent = '🔍 Get Recommendations';
+            }
+        }
+
+        // Display results
+        function displayResults(data) {
+            const resultsSection = document.getElementById('resultsSection');
+            const jobRoleTitle = document.getElementById('jobRoleTitle');
+            const resultsCount = document.getElementById('resultsCount');
+            const testCards = document.getElementById('testCards');
+
+            // Update header
+            jobRoleTitle.textContent = data.job_role;
+            resultsCount.textContent = `${data.total_recommendations} Tests`;
+
+            // Clear previous results
+            testCards.innerHTML = '';
+
+            // Check if no recommendations
+            if (data.recommendations.length === 0) {
+                testCards.innerHTML = '<p style="text-align: center; color: #666; padding: 40px;">No recommendations found. Try a different job role.</p>';
+            } else {
+                // Create test cards
+                data.recommendations.forEach((test, index) => {
+                    const card = createTestCard(test, index + 1);
+                    testCards.appendChild(card);
+                });
+            }
+
+            // Show results
+            resultsSection.classList.add('active');
+        }
+
+        // Create test card element
+        function createTestCard(test, rank) {
+            const card = document.createElement('div');
+            card.className = 'test-card';
+            
+            // Determine confidence level
+            const confidenceClass = test.confidence_score >= 70 ? 'confidence-high' : 
+                                   test.confidence_score >= 40 ? 'confidence-medium' : 
+                                   'confidence-low';
+            
+            const confidenceLabel = test.confidence_score >= 70 ? 'High Match' : 
+                                   test.confidence_score >= 40 ? 'Medium Match' : 
+                                   'Low Match';
+
+            card.innerHTML = `
+                <div class="test-header">
+                    <div>
+                        <div class="test-name">${rank}. ${test.test_name}</div>
+                    </div>
+                    <div class="confidence-badge ${confidenceClass}">
+                        ${confidenceLabel} • ${test.confidence_score}%
+                    </div>
+                </div>
+                <div class="test-description">
+                    ${test.test_description || 'No description available'}
+                </div>
+                <div class="test-meta">
+                    <div class="meta-item">
+                        <span>📁</span>
+                        <span class="category-tag">${test.category || 'General'}</span>
+                    </div>
+                    <div class="meta-item">
+                        <span>🎯</span>
+                        <span><strong>Skills:</strong> ${test.skills_match || 'Various skills'}</span>
+                    </div>
+                </div>
+            `;
+
+            return card;
+        }
+
+        // Show error message
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = `⚠️ ${message}`;
+            errorDiv.classList.add('active');
+
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                hideError();
+            }, 5000);
+        }
+
+        // Hide error message
+        function hideError() {
+            document.getElementById('errorMessage').classList.remove('active');
+        }
+
+        // Show loading
+        function showLoading() {
+            document.getElementById('loading').classList.add('active');
+        }
+
+        // Hide loading
+        function hideLoading() {
+            document.getElementById('loading').classList.remove('active');
+        }
+
+        // Hide results
+        function hideResults() {
+            document.getElementById('resultsSection').classList.remove('active');
+        }
+
+        // Check API health on page load
+        window.addEventListener('load', async () => {
+            try {
+                const response = await fetch(`${API_URL}/health`);
+                if (response.ok) {
+                    console.log('✅ API is connected and ready!');
+                }
+            } catch (error) {
+                showError('Cannot connect to API. Please start the FastAPI server!');
+            }
+        });
+    </script>
+</body>
+</html>
