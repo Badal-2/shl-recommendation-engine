@@ -9,23 +9,3 @@ numpy==1.26.2
 scikit-learn==1.3.2
 python-multipart==0.0.6
 gunicorn==21.2.0
-```
-
-
-
----
-
-## **PROJECT STRUCTURE** ✅
-```
-shl-recommendation-engine/
-├── app/                   ← ✅ Should exist
-├── ml/                    ← ✅ Should exist
-├── static/                ← ✅ Should exist
-├── env/                   ← ✅ (git will ignore this)
-├── .env                   ← ✅ (git will ignore this)
-├── .gitignore             ← ✅ Should exist
-├── Procfile               ← ✅ NEW (just created)
-├── requirements.txt       ← ✅ UPDATED (added gunicorn)
-├── runtime.txt            ← ✅ NEW (just created)
-├── render.yaml            ← ✅ NEW (just created)
-└── README.md              ← ✅ Should exist
