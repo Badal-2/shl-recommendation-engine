@@ -6,7 +6,8 @@ from sqlalchemy import text
 from typing import List
 from datetime import datetime
 import json
-
+# Updated: Add seed endpoint
+from fastapi import FastAPI, Depends, HTTPException
 # Import from our app modules
 from app.database import engine, get_db, Base, SessionLocal
 from app import models, schemas
