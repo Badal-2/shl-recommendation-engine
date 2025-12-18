@@ -166,3 +166,32 @@ async def get_recommendations(
 async def get_model_info():
     """Get information about the ML model"""
     return recommendation_engine.get_model_info()
+
+
+@app.get("/seed-database")
+async def seed_database(db: Session = Depends(get_db)):
+    """Seed database with sample data"""
+    try:
+        from ml.data.sample_assessments import SAMPLE_ASSESSMENTS, SAMPLE_JOB_ROLES
+        
+        existing = db.query(models.Assessment).count()
+        if existing > 0:
+            return {"status": "already_seeded", "count": existing}
+        
+        for assessment_data in SAMPLE_ASSESSMENTS:
+            db.add(models.Assessment(**assessment_data))
+        
+        for role_data in SAMPLE_JOB_ROLES:
+            db.add(models.JobRole(**role_data))
+        
+        db.commit()
+        recommendation_engine.train(db)
+        
+        return {
+            "status": "success",
+            "assessments": len(SAMPLE_ASSESSMENTS),
+            "job_roles": len(SAMPLE_JOB_ROLES)
+        }
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
